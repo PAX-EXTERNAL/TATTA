@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Pra Você 💙</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {                                                  margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at center, #01122a, #000000);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  /* TELA DE SUSPENSE INICIAL */
+  #start {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 162, 255, 0.2);
+    padding: 50px 30px;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 20;
+    width: 90%;
+    max-width: 400px;
+  }
+
+  h1 {
+    font-size: clamp(20px, 5vw, 24px);
+    color: #4da3ff;
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px rgba(77, 163, 255, 0.5);
+  }
+
+  .btn-abrir {
+    background: linear-gradient(45deg, #0066cc, #4da3ff);
+    color: white;
+    padding: 15px 40px;
+    border-radius: 50px;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 102, 204, 0.6);
+    animation: pulsar 2s infinite alternate;
+  }
+
+  @keyframes pulsar {
+    0% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 102, 204, 0.4); }
+    100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(77, 163, 255, 0.8); }
+  }
+
+  /* TELA DOS LÍRIOS E TEXTO */
+  #conteudo {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+  }
+
+  #nome {
+    position: absolute;
+    width: 100%;
+    top: 10%;
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(40px, 12vw, 55px);
+    color: #87cefa;
+    text-shadow: 0 0 20px rgba(135, 206, 250, 0.6);
+    z-index: 10;
+  }
+
+  #msg-container {
+    position: absolute;
+    width: 100%;
+    bottom: 12%;
+    padding: 0 25px;
+    z-index: 10;
+  }
+
+  #msg {
+    font-size: clamp(18px, 6vw, 24px);
+    line-height: 1.5;
+    text-shadow: 2px 2px 5px rgba(0,0,0,1);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    min-height: 72px; /* Mantém a altura para os botões não pularem */
+  }
+
+  .cursor {
+    display: inline-block;
+    color: #87cefa;
+    animation: piscar-cursor 0.8s infinite;
+  }
+
+  @keyframes piscar-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  #dica {
+    font-size: 13px;
+    color: rgba(135, 206, 250, 0.6);
+    margin-top: 15px;
+    animation: piscar 2s infinite;
+  }
+
+  @keyframes piscar {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  /* BOTÕES FINAIS SIM/NÃO */
+  #botoes-finais {
+    display: none;
+    margin-top: 25px;
+    gap: 15px;
+    justify-content: center;
+    position: relative;
+    height: 60px;
+  }
+
+  .btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-size: clamp(15px, 4vw, 17px);
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    z-index: 15;
+  }
+
+  #sim {
+    background: linear-gradient(45deg, #0055ff, #00aaff);
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 170, 255, 0.6);
+  }
+
+  #nao {
+    background: transparent;
+    color: #4da3ff;
+    border: 2px solid #4da3ff;
+    transition: all 0.2s ease;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+
+  /* MODAL: TELA "PILANTRINHA" */
+  #modal-pilantrinha {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: rgba(1, 18, 42, 0.95);
+    border: 2px solid #4da3ff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0, 162, 255, 0.6);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 85%;
+  }
+
+  .modal-content h2 {
+    color: #87cefa;
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(20px, 6vw, 26px);
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-shadow: 0 0 15px rgba(135, 206, 250, 0.5);
+  }
+
+  .btn-fechar {
+    background: linear-gradient(45deg, #0055ff, #00aaff);
+    color: white;
+    padding: 12px 35px;
+    border-radius: 50px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  #player-wrapper {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    width: 300px;
+    height: 300px;
+    opacity: 0.01;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="player-wrapper">
+  <div id="player"></div>
+</div>
+
+<div id="start">
+  <h1>Tatta, tenho uma coisa pra te falar...</h1>
+  <button class="btn-abrir" onclick="abrirSurpresa()">Abrir 💌</button>
+</div>
+
+<div id="conteudo" onclick="avancarMensagem()">
+  <div id="nome">Pra você 💙</div>
+
+  <div id="msg-container">
+    <div id="msg"></div>
+    <div id="botoes-finais">
+      <button class="btn" id="sim" onclick="aceitou(event)">SIM 💙</button>
+      <button class="btn" id="nao" onclick="negou(event)">NÃO 😶</button>
+    </div>
+    <div id="dica">Toque na tela para continuar...</div>
+  </div>
+  <canvas id="c"></canvas>
+</div>
+
+<div id="modal-pilantrinha">
+  <div class="modal-content">
+    <h2>TEM QUE ACEITAR PILANTRINHA 😌💙</h2>
+    <button class="btn-fechar" onclick="fecharModal()">Tá bom 🙄</button>
+  </div>
+</div>
+
+<script>
+// ================= MÚSICA YOUTUBE =================
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player;
+var ytPronto = false;
+var pendenteParaTocar = false;
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    videoId: 'vxwg6qClduE',
+    playerVars: { 'autoplay': 0, 'controls': 0, 'playsinline': 1 },
+    events: {
+      'onReady': function(event) {
+        ytPronto = true;
+        event.target.setVolume(20);
+        if (pendenteParaTocar) {
+          event.target.playVideo();
+        }
+      }
+    }
+  });
+}
+
+// ================= LÓGICA DO ROTEIRO E MÁQUINA DE ESCREVER =================
+function abrirSurpresa() {
+  document.getElementById("start").style.display = "none";
+  document.getElementById("conteudo").style.display = "block";
+
+  if (ytPronto) {
+    player.playVideo();
+  } else {
+    pendenteParaTocar = true;
+  }
+
+  startAnim();
+  setTimeout(avancarMensagem, 800);
+}
+
+let etapa = 0;
+let digitando = false; // Trava para impedir avanços loucos enquanto digita
+
+const mensagens = [
+  "Eu nem sei direito quando começou...",
+  "Mas de repente, você virou diferente pra mim.",
+  "Tatta...",
+  "Você mexe comigo de um jeito que eu não sei explicar.",
+  "E eu gosto de você de verdade.",
+  "Então...",
+  "Você aceita ficar comigo? 💙"
+];
+
+function avancarMensagem() {
+  if (digitando) return; // Se estiver digitando, ignora o toque na tela
+
+  if (etapa < mensagens.length) {
+    digitando = true;
+    const msg = document.getElementById("msg");
+
+    // Apaga a mensagem antiga suavemente
+    msg.style.opacity = 0;
+
+    setTimeout(() => {
+      msg.style.opacity = 1;
+      msg.innerHTML = "";
+
+      const texto = mensagens[etapa];
+      let i = 0;
+
+      // Efeito de Digitação
+      function digitarLetra() {
+        if (i < texto.length) {
+          msg.innerHTML = texto.substring(0, i + 1) + '<span class="cursor">|</span>';
+          i++;
+          // A velocidade da digitação fica aqui (50ms por letra)
+          setTimeout(digitarLetra, 60);
+        } else {
+          // Terminou de digitar a frase
+          msg.innerHTML = texto;
+          digitando = false;
+          etapa++;
+
+          // Se for a última mensagem, revela os botões
+          if (etapa === mensagens.length) {
+            document.getElementById("dica").style.display = "none";
+            document.getElementById("botoes-finais").style.display = "flex";
+            document.getElementById("conteudo").onclick = null;
+          }
+        }
+      }
+
+      digitarLetra();
+    }, 400); // Tempo para o texto antigo sumir
+  }
+}
+
+// ================= BOTÕES FINAIS =================
+let tentativas = 0;
+function negou(event) {
+  event.stopPropagation();
+  tentativas++;
+  const nao = document.getElementById("nao");
+  const sim = document.getElementById("sim");
+
+  if (tentativas === 1) nao.innerText = "Tem certeza? 😕";
+  else if (tentativas === 2) nao.innerText = "Pensa direito... 😶";
+  else if (tentativas === 3) nao.innerText = "Última chance 👀";
+  else {
+    document.getElementById("modal-pilantrinha").style.display = "flex";
+    return;
+  }
+
+  nao.style.position = "fixed";
+
+  const simRect = sim.getBoundingClientRect();
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  const btnWidth = nao.offsetWidth;
+  const btnHeight = nao.offsetHeight;
+
+  let randomX, randomY;
+  let bateu = true;
+  let antiLoop = 0;
+
+  while (bateu && antiLoop < 50) {
+    randomX = 10 + Math.random() * (w - btnWidth - 20);
+    randomY = 10 + Math.random() * (h - btnHeight - 20);
+
+    if (
+      randomX < simRect.right + 20 &&
+      randomX + btnWidth > simRect.left - 20 &&
+      randomY < simRect.bottom + 20 &&
+      randomY + btnHeight > simRect.top - 20
+    ) {
+      bateu = true;
+    } else {
+      bateu = false;
+    }
+    antiLoop++;
+  }
+
+  nao.style.left = randomX + "px";
+  nao.style.top = randomY + "px";
+}
+
+function fecharModal() {
+  document.getElementById("modal-pilantrinha").style.display = "none";
+  document.getElementById("nao").style.display = "none";
+}
+
+let finalizou = false;
+function aceitou(event) {
+  event.stopPropagation();
+  finalizou = true;
+  document.getElementById("botoes-finais").style.display = "none";
+
+  const msg = document.getElementById("msg");
+  msg.style.opacity = 0;
+
+  setTimeout(() => {
+    msg.style.opacity = 1;
+    const textoFinal = "Você me faz o homem mais feliz do mundo! 💙✨";
+    let i = 0;
+
+    // Digita a mensagem final comemorativa também!
+    function digitarFinal() {
+      if(i < textoFinal.length) {
+        msg.innerHTML = textoFinal.substring(0, i + 1) + '<span class="cursor">|</span>';
+        i++;
+        setTimeout(digitarFinal, 50);
+      } else {
+        msg.innerHTML = textoFinal;
+      }
+    }
+    digitarFinal();
+
+    // Inicia chuva de pétalas e corações!
+    criarChuvaDePetalasECoracoes();
+  }, 400);
+}
+
+// ================= CANVAS: LÍRIOS E CORAÇÕES MÁGICOS =================
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+let w, h;
+const polem = [];
+
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+for(let i = 0; i < 60; i++) {
+  polem.push({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 1.5 + 0.5,
+    vy: (Math.random() * -0.5) - 0.2,
+    vx: (Math.random() - 0.5) * 0.3
+  });
+}
+
+function desenharPetala(tamanho, cor, corBorda) {
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.quadraticCurveTo(tamanho * 0.4, -tamanho * 0.3, 0, -tamanho);
+  ctx.quadraticCurveTo(-tamanho * 0.4, -tamanho * 0.3, 0, 0);
+
+  ctx.fillStyle = cor;
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = corBorda;
+  ctx.stroke();
+}
+
+function desenharCoracao(tamanho, cor) {
+  ctx.beginPath();
+  ctx.moveTo(0, tamanho / 4);
+  ctx.quadraticCurveTo(0, 0, tamanho / 2, 0);
+  ctx.quadraticCurveTo(tamanho, 0, tamanho, tamanho / 4);
+  ctx.quadraticCurveTo(tamanho, tamanho / 2, 0, tamanho);
+  ctx.quadraticCurveTo(-tamanho, tamanho / 2, -tamanho, tamanho / 4);
+  ctx.quadraticCurveTo(-tamanho, 0, -tamanho / 2, 0);
+  ctx.quadraticCurveTo(0, 0, 0, tamanho / 4);
+  ctx.fillStyle = cor;
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = cor;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+let tempo = 0;
+const petalasCaindo = [];
+const coracoesSubindo = [];
+
+function criarChuvaDePetalasECoracoes() {
+  // Cria pétalas caindo do teto
+  for(let i = 0; i < 40; i++) {
+    petalasCaindo.push({
+      x: Math.random() * w,
+      y: -50 - Math.random() * 200,
+      tamanho: Math.random() * 15 + 10,
+      ang: Math.random() * Math.PI * 2,
+      velY: Math.random() * 2 + 1,
+      velX: (Math.random() - 0.5) * 2,
+      giro: (Math.random() - 0.5) * 0.1
+    });
+  }
+
+  // Cria corações subindo do chão
+  for(let i = 0; i < 35; i++) {
+    coracoesSubindo.push({
+      x: Math.random() * w,
+      y: h + 50 + Math.random() * 200,
+      tamanho: Math.random() * 12 + 8,
+      velY: -(Math.random() * 2 + 1.5), // Velocidade negativa para subir
+      velX: (Math.random() - 0.5) * 1.5,
+      opacidade: Math.random() * 0.5 + 0.4
+    });
+  }
+}
+
+function startAnim() {
+  function animate() {
+    ctx.fillStyle = "rgba(1, 15, 35, 0.2)";
+    ctx.fillRect(0, 0, w, h);
+
+    // Fundo estrelado (polens)
+    ctx.fillStyle = "rgba(135, 206, 250, 0.7)";
+    polem.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      p.y += p.vy;
+      p.x += p.vx;
+      if(p.y < 0) { p.y = h; p.x = Math.random() * w; }
+    });
+
+    // Lírio central
+    ctx.save();
+    ctx.translate(w / 2, (h / 2) - 60);
+
+    let respiracao = 1 + Math.sin(tempo * 0.03) * 0.08;
+    ctx.scale(respiracao, respiracao);
+
+    let baseTamanho = w < 500 ? (w / 3.5) : 150;
+    ctx.rotate(tempo * 0.005);
+
+    for (let i = 0; i < 6; i++) {
+      ctx.save();
+      ctx.rotate((Math.PI * 2 / 6) * i);
+      desenharPetala(baseTamanho, "rgba(0, 77, 153, 0.6)", "rgba(77, 163, 255, 0.8)");
+      ctx.rotate(Math.PI / 6);
+      desenharPetala(baseTamanho * 0.75, "rgba(0, 162, 255, 0.5)", "rgba(135, 206, 250, 0.9)");
+      ctx.restore();
+    }
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#87cefa";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+
+    // Chuva Final (Pétalas caindo e Corações subindo)
+    if (finalizou) {
+      // Desenha as pétalas
+      petalasCaindo.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.ang);
+        desenharPetala(p.tamanho, "rgba(77, 163, 255, 0.8)", "transparent");
+        ctx.restore();
+        p.y += p.velY;
+        p.x += p.velX;
+        p.ang += p.giro;
+      });
+
+      // Desenha os corações mágicos subindo
+      coracoesSubindo.forEach(c => {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        desenharCoracao(c.tamanho, `rgba(77, 163, 255, ${c.opacidade})`);
+        ctx.restore();
+        c.y += c.velY;
+        c.x += c.velX;
+      });
+    }
+
+    tempo++;
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+</script>
+</body>
+</html>
